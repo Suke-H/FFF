@@ -39,7 +39,20 @@ const gameSlice = createSlice({
     },
     addItem(state, action: PayloadAction<ExpressionItem>) {
       if (state.status !== 'playing') return;
-      state.expression.push(action.payload);
+      const item = action.payload;
+
+      if (item.kind === 'color') {
+        if (state.expression.length > 0) {
+          const last = state.expression[state.expression.length - 1];
+          if (last.kind !== 'operator') return;
+        }
+        const alreadyUsed = state.expression.some(
+          e => e.kind === 'color' && e.value === item.value
+        );
+        if (alreadyUsed) return;
+      }
+
+      state.expression.push(item);
       const result = evaluateExpression(state.expression, ALL_OPERATORS);
       if (result !== null && result === state.target) {
         state.status = 'cleared';

@@ -15,7 +15,7 @@ import { ResultFeedback } from './components/game/ResultFeedback';
 
 export default function App() {
   const dispatch = useGameDispatch();
-  const { palette, availableOperatorIds, availableFilterIds } = useSelector((s: RootState) => s.game);
+  const { palette, availableOperatorIds, availableFilterIds, currentStageId } = useSelector((s: RootState) => s.game);
   const availableOperators = ALL_OPERATORS.filter((op) =>
     availableOperatorIds.includes(op.id)
   );
@@ -29,7 +29,26 @@ export default function App() {
 
   return (
     <div style={{ padding: 32, maxWidth: 600, margin: '0 auto', color: '#fff' }}>
-      <h1 style={{ marginBottom: 24 }}>FFF</h1>
+      <h1 style={{ marginBottom: 16 }}>FFF</h1>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+        {stages.map((stage) => (
+          <button
+            key={stage.id}
+            onClick={() => dispatch(loadStage(stage))}
+            style={{
+              padding: '6px 14px',
+              cursor: 'pointer',
+              borderRadius: 6,
+              border: currentStageId === stage.id ? '2px solid #fff' : '2px solid #555',
+              background: currentStageId === stage.id ? '#333' : '#1a1a1a',
+              color: '#fff',
+              fontSize: 14,
+            }}
+          >
+            {stage.id}
+          </button>
+        ))}
+      </div>
       <TargetColor />
       <div style={{ marginTop: 24 }}>
         <ExpressionBar />

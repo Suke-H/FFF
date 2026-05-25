@@ -16,14 +16,22 @@ export type UnaryOperator = {
 
 export type Operator = BinaryOperator | UnaryOperator;
 
+export type Filter = {
+  id: string;
+  symbol: string;
+  apply: (a: Color) => Color;
+};
+
 export type ExpressionItem =
   | { kind: 'color'; value: Color }
-  | { kind: 'operator'; id: string };
+  | { kind: 'operator'; id: string }
+  | { kind: 'filter'; id: string };
 
 export type Stage = {
   id: string;
   target: Color;
   palette: Color[];
   availableOperatorIds: string[];
+  availableFilterIds: string[];
   par: number;
 };

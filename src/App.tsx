@@ -5,17 +5,22 @@ import { loadStage, addItem, resetExpression } from './store/gameSlice';
 import { useGameDispatch } from './hooks/useGameDispatch';
 import { stages } from './game/stages';
 import { ALL_OPERATORS } from './game/operators';
+import { ALL_FILTERS } from './game/filters';
 import { TargetColor } from './components/game/TargetColor';
 import { ColorCard } from './components/game/ColorCard';
 import { OperatorButton } from './components/game/OperatorButton';
+import { FilterButton } from './components/game/FilterButton';
 import { ExpressionBar } from './components/game/ExpressionBar';
 import { ResultFeedback } from './components/game/ResultFeedback';
 
 export default function App() {
   const dispatch = useGameDispatch();
-  const { palette, availableOperatorIds } = useSelector((s: RootState) => s.game);
+  const { palette, availableOperatorIds, availableFilterIds } = useSelector((s: RootState) => s.game);
   const availableOperators = ALL_OPERATORS.filter((op) =>
     availableOperatorIds.includes(op.id)
+  );
+  const availableFilters = ALL_FILTERS.filter((f) =>
+    availableFilterIds.includes(f.id)
   );
 
   useEffect(() => {
@@ -39,12 +44,19 @@ export default function App() {
           />
         ))}
       </div>
-      <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
+      <div style={{ marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         {availableOperators.map((op) => (
           <OperatorButton
             key={op.id}
             operator={op}
             onClick={() => dispatch(addItem({ kind: 'operator', id: op.id }))}
+          />
+        ))}
+        {availableFilters.map((f) => (
+          <FilterButton
+            key={f.id}
+            filter={f}
+            onClick={() => dispatch(addItem({ kind: 'filter', id: f.id }))}
           />
         ))}
       </div>

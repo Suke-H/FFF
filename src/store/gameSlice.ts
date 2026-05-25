@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Color, ExpressionItem, Stage } from '../game/types';
 import { ALL_OPERATORS } from '../game/operators';
+import { ALL_FILTERS } from '../game/filters';
 import { evaluateExpression } from '../game/expression';
 
 type GameStatus = 'playing' | 'cleared' | 'failed';
@@ -11,6 +12,7 @@ interface GameState {
   palette: Color[];
   target: Color;
   availableOperatorIds: string[];
+  availableFilterIds: string[];
   expression: ExpressionItem[];
   status: GameStatus;
 }
@@ -20,6 +22,7 @@ const initialState: GameState = {
   palette: [],
   target: '#000',
   availableOperatorIds: [],
+  availableFilterIds: [],
   expression: [],
   status: 'playing',
 };
@@ -34,6 +37,7 @@ const gameSlice = createSlice({
       state.palette = stage.palette;
       state.target = stage.target;
       state.availableOperatorIds = stage.availableOperatorIds;
+      state.availableFilterIds = stage.availableFilterIds;
       state.expression = [];
       state.status = 'playing';
     },
@@ -52,8 +56,14 @@ const gameSlice = createSlice({
         if (alreadyUsed) return;
       }
 
+      if (item.kind === 'filter') {
+        if (state.expression.length === 0) return;
+        const last = state.expression[state.expression.length - 1];
+        if (last.kind !== 'color' && last.kind !== 'filter') return;
+      }
+
       state.expression.push(item);
-      const result = evaluateExpression(state.expression, ALL_OPERATORS);
+      const result = evaluateExpression(state.expression, ALL_OPERATORS, ALL_FILTERS);
       if (result !== null && result === state.target) {
         state.status = 'cleared';
       }

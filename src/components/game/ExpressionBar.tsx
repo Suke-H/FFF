@@ -1,13 +1,14 @@
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { ALL_OPERATORS } from '../../game/operators';
+import { ALL_FILTERS } from '../../game/filters';
 import { evaluateExpression } from '../../game/expression';
 import { ColorSwatch } from '../ui/ColorSwatch';
 import { ColorCode } from '../ui/ColorCode';
 
 export function ExpressionBar() {
   const expression = useSelector((s: RootState) => s.game.expression);
-  const result = evaluateExpression(expression, ALL_OPERATORS);
+  const result = evaluateExpression(expression, ALL_OPERATORS, ALL_FILTERS);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minHeight: 56 }}>
@@ -17,6 +18,10 @@ export function ExpressionBar() {
             <ColorSwatch color={item.value} size={40} />
             <ColorCode color={item.value} />
           </div>
+        ) : item.kind === 'filter' ? (
+          <span key={i} style={{ fontSize: 24, fontWeight: 'bold', color: '#cc88ff' }}>
+            {ALL_FILTERS.find((f) => f.id === item.id)?.symbol ?? item.id}
+          </span>
         ) : (
           <span key={i} style={{ fontSize: 24, fontWeight: 'bold', color: '#ccc' }}>
             {ALL_OPERATORS.find((o) => o.id === item.id)?.symbol ?? item.id}

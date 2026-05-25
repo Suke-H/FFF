@@ -72,8 +72,30 @@ const gameSlice = createSlice({
       state.expression = [];
       state.status = 'playing';
     },
+    setTarget(state, action: PayloadAction<Color>) {
+      state.target = action.payload;
+      state.expression = [];
+      state.status = 'playing';
+    },
+    addPaletteColor(state, action: PayloadAction<Color>) {
+      if (!state.palette.includes(action.payload))
+        state.palette.push(action.payload);
+    },
+    removePaletteColor(state, action: PayloadAction<Color>) {
+      state.palette = state.palette.filter(c => c !== action.payload);
+      state.expression = state.expression.filter(
+        e => !(e.kind === 'color' && e.value === action.payload)
+      );
+    },
+    toggleFilter(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      if (state.availableFilterIds.includes(id))
+        state.availableFilterIds = state.availableFilterIds.filter(f => f !== id);
+      else
+        state.availableFilterIds.push(id);
+    },
   },
 });
 
-export const { loadStage, addItem, resetExpression } = gameSlice.actions;
+export const { loadStage, addItem, resetExpression, setTarget, addPaletteColor, removePaletteColor, toggleFilter } = gameSlice.actions;
 export default gameSlice.reducer;

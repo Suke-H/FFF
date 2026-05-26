@@ -1,4 +1,4 @@
-import type { Color } from './types';
+import type { Color, ValueChannel } from './types';
 
 function parseColor(hex: Color): [number, number, number] {
   const r = parseInt(hex[1], 16);
@@ -13,6 +13,14 @@ function formatColor(r: number, g: number, b: number): Color {
 
 function clamp(n: number): number {
   return Math.max(0, Math.min(15, n));
+}
+
+export function valueToColor(amount: number, channel: ValueChannel): Color {
+  return formatColor(
+    channel === 'r' ? amount : 0,
+    channel === 'g' ? amount : 0,
+    channel === 'b' ? amount : 0,
+  );
 }
 
 export function addColors(a: Color, b: Color): Color {

@@ -13,6 +13,8 @@ interface GameState {
   target: Color;
   availableOperatorIds: string[];
   availableFilterIds: string[];
+  availableValues: number[];
+  pendingValue: number | null;
   expression: ExpressionItem[];
   status: GameStatus;
 }
@@ -23,6 +25,8 @@ const initialState: GameState = {
   target: '#000',
   availableOperatorIds: [],
   availableFilterIds: [],
+  availableValues: [],
+  pendingValue: null,
   expression: [],
   status: 'playing',
 };
@@ -38,8 +42,13 @@ const gameSlice = createSlice({
       state.target = stage.target;
       state.availableOperatorIds = stage.availableOperatorIds;
       state.availableFilterIds = stage.availableFilterIds;
+      state.availableValues = stage.availableValues ?? [];
+      state.pendingValue = null;
       state.expression = [];
       state.status = 'playing';
+    },
+    setPendingValue(state, action: PayloadAction<number | null>) {
+      state.pendingValue = action.payload;
     },
     addItem(state, action: PayloadAction<ExpressionItem>) {
       if (state.status !== 'playing') return;
@@ -54,12 +63,25 @@ const gameSlice = createSlice({
           e => e.kind === 'color' && e.value === item.value
         );
         if (alreadyUsed) return;
+        state.pendingValue = null;
+      }
+
+      if (item.kind === 'value') {
+        if (state.expression.length > 0) {
+          const last = state.expression[state.expression.length - 1];
+          if (last.kind !== 'operator') return;
+        }
+        state.pendingValue = null;
       }
 
       if (item.kind === 'filter') {
         if (state.expression.length === 0) return;
         const last = state.expression[state.expression.length - 1];
-        if (last.kind !== 'color' && last.kind !== 'filter') return;
+        if (last.kind !== 'color' && last.kind !== 'filter' && last.kind !== 'value') return;
+      }
+
+      if (item.kind === 'operator') {
+        state.pendingValue = null;
       }
 
       state.expression.push(item);
@@ -70,11 +92,13 @@ const gameSlice = createSlice({
     },
     resetExpression(state) {
       state.expression = [];
+      state.pendingValue = null;
       state.status = 'playing';
     },
     setTarget(state, action: PayloadAction<Color>) {
       state.target = action.payload;
       state.expression = [];
+      state.pendingValue = null;
       state.status = 'playing';
     },
     addPaletteColor(state, action: PayloadAction<Color>) {
@@ -97,5 +121,5 @@ const gameSlice = createSlice({
   },
 });
 
-export const { loadStage, addItem, resetExpression, setTarget, addPaletteColor, removePaletteColor, toggleFilter } = gameSlice.actions;
+export const { loadStage, addItem, resetExpression, setTarget, addPaletteColor, removePaletteColor, toggleFilter, setPendingValue } = gameSlice.actions;
 export default gameSlice.reducer;

@@ -1,4 +1,11 @@
 import type { Color, ExpressionItem, Filter, Operator } from './types';
+import { valueToColor } from './color';
+
+function resolveColor(item: ExpressionItem): Color | null {
+  if (item.kind === 'color') return item.value;
+  if (item.kind === 'value') return valueToColor(item.amount, item.channel);
+  return null;
+}
 
 export function evaluateExpression(
   items: ExpressionItem[],
@@ -6,12 +13,13 @@ export function evaluateExpression(
   filters: Filter[]
 ): Color | null {
   if (items.length === 0) return null;
-  if (items[0].kind !== 'color') return null;
+  const firstColor = resolveColor(items[0]);
+  if (firstColor === null) return null;
 
-  let result: Color = items[0].value;
+  let result: Color = firstColor;
   let i = 1;
 
-  // apply consecutive filters after a color
+  // apply consecutive filters after a color/value
   while (i < items.length && items[i].kind === 'filter') {
     const f = filters.find((f) => f.id === (items[i] as { kind: 'filter'; id: string }).id);
     if (!f) return null;
@@ -27,9 +35,10 @@ export function evaluateExpression(
     if (!op) return null;
 
     if (op.arity === 2) {
-      const colorItem = items[i + 1];
-      if (!colorItem || colorItem.kind !== 'color') return null;
-      let rhs: Color = colorItem.value;
+      const rhsItem = items[i + 1];
+      const rhsColor = rhsItem ? resolveColor(rhsItem) : null;
+      if (rhsColor === null) return null;
+      let rhs: Color = rhsColor;
       i += 2;
       while (i < items.length && items[i].kind === 'filter') {
         const f = filters.find((f) => f.id === (items[i] as { kind: 'filter'; id: string }).id);

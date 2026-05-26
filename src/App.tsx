@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from './store';
-import { loadStage, addItem, resetExpression } from './store/gameSlice';
+import { loadStage, addItem, resetExpression, setPendingValue } from './store/gameSlice';
 import { useGameDispatch } from './hooks/useGameDispatch';
 import { stages } from './game/stages';
 import { ALL_OPERATORS } from './game/operators';
@@ -13,12 +13,13 @@ import { FilterButton } from './components/game/FilterButton';
 import { ExpressionBar } from './components/game/ExpressionBar';
 import { ResultFeedback } from './components/game/ResultFeedback';
 import { StageEditor } from './components/game/StageEditor';
+import { ValuePicker } from './components/game/ValuePicker';
 
 type Mode = 'play' | 'edit';
 
 export default function App() {
   const dispatch = useGameDispatch();
-  const { palette, availableOperatorIds, availableFilterIds, currentStageId } = useSelector((s: RootState) => s.game);
+  const { palette, availableOperatorIds, availableFilterIds, availableValues, pendingValue, currentStageId } = useSelector((s: RootState) => s.game);
   const [mode, setMode] = useState<Mode>('play');
 
   const availableOperators = ALL_OPERATORS.filter((op) =>
@@ -110,6 +111,19 @@ export default function App() {
               />
             ))}
           </div>
+          {availableValues.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <ValuePicker
+                amounts={availableValues}
+                pending={pendingValue}
+                onSelectAmount={(amount) => dispatch(setPendingValue(amount))}
+                onSelectChannel={(channel) =>
+                  pendingValue !== null &&
+                  dispatch(addItem({ kind: 'value', amount: pendingValue, channel }))
+                }
+              />
+            </div>
+          )}
           <div style={{ marginTop: 16 }}>
             <button
               onClick={() => dispatch(resetExpression())}

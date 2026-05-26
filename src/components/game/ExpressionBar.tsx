@@ -18,6 +18,15 @@ export function ExpressionBar() {
             <ColorSwatch color={item.value} size={40} />
             <ColorCode color={item.value} />
           </div>
+        ) : item.kind === 'value' ? (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                 gap: 2, padding: '4px 8px', border: '1px solid #4488cc',
+                                 borderRadius: 6, color: '#88ccff' }}>
+            <span style={{ fontSize: 12 }}>{item.channel.toUpperCase()}</span>
+            <span style={{ fontSize: 22, fontWeight: 'bold' }}>
+              {item.amount.toString(16).toUpperCase()}
+            </span>
+          </div>
         ) : item.kind === 'filter' ? (
           <span key={i} style={{ fontSize: 24, fontWeight: 'bold', color: '#cc88ff' }}>
             {ALL_FILTERS.find((f) => f.id === item.id)?.symbol ?? item.id}

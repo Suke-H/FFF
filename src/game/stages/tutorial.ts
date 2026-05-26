@@ -81,4 +81,13 @@ export const tutorialStages: Stage[] = [
     availableFilterIds: ['invert'],
     par: 3,
   },
+  {
+    id: 'stage-v1',
+    target: '#F08',
+    palette: ['#F00'],
+    availableOperatorIds: ['add'],
+    availableFilterIds: [],
+    availableValues: [8],
+    par: 1,
+  },
 ];

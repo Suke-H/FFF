@@ -22,10 +22,13 @@ export type Filter = {
   apply: (a: Color) => Color;
 };
 
+export type ValueChannel = 'r' | 'g' | 'b';
+
 export type ExpressionItem =
   | { kind: 'color'; value: Color }
   | { kind: 'operator'; id: string }
-  | { kind: 'filter'; id: string };
+  | { kind: 'filter'; id: string }
+  | { kind: 'value'; amount: number; channel: ValueChannel };
 
 export type Stage = {
   id: string;
@@ -33,5 +36,6 @@ export type Stage = {
   palette: Color[];
   availableOperatorIds: string[];
   availableFilterIds: string[];
+  availableValues?: number[];
   par: number;
 };

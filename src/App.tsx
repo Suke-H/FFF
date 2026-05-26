@@ -6,6 +6,7 @@ import { useGameDispatch } from './hooks/useGameDispatch';
 import { stages } from './game/stages';
 import { ALL_OPERATORS } from './game/operators';
 import { ALL_FILTERS } from './game/filters';
+import { nextAllowed } from './game/expression';
 import { TargetColor } from './components/game/TargetColor';
 import { ColorCard } from './components/game/ColorCard';
 import { OperatorButton } from './components/game/OperatorButton';
@@ -19,7 +20,8 @@ type Mode = 'play' | 'edit';
 
 export default function App() {
   const dispatch = useGameDispatch();
-  const { palette, availableOperatorIds, availableFilterIds, availableValues, pendingValue, currentStageId } = useSelector((s: RootState) => s.game);
+  const { palette, availableOperatorIds, availableFilterIds, availableValues, pendingValue, currentStageId, expression } = useSelector((s: RootState) => s.game);
+  const allowed = nextAllowed(expression);
   const [mode, setMode] = useState<Mode>('play');
 
   const availableOperators = ALL_OPERATORS.filter((op) =>
@@ -91,6 +93,7 @@ export default function App() {
               <ColorCard
                 key={color}
                 color={color}
+                disabled={!allowed.has('color')}
                 onClick={() => dispatch(addItem({ kind: 'color', value: color }))}
               />
             ))}
@@ -100,6 +103,7 @@ export default function App() {
               <OperatorButton
                 key={op.id}
                 operator={op}
+                disabled={!allowed.has('operator')}
                 onClick={() => dispatch(addItem({ kind: 'operator', id: op.id }))}
               />
             ))}
@@ -107,6 +111,7 @@ export default function App() {
               <FilterButton
                 key={f.id}
                 filter={f}
+                disabled={!allowed.has('filter')}
                 onClick={() => dispatch(addItem({ kind: 'filter', id: f.id }))}
               />
             ))}
@@ -116,6 +121,7 @@ export default function App() {
               <ValuePicker
                 amounts={availableValues}
                 pending={pendingValue}
+                disabled={!allowed.has('value')}
                 onSelectAmount={(amount) => dispatch(setPendingValue(amount))}
                 onSelectChannel={(channel) =>
                   pendingValue !== null &&

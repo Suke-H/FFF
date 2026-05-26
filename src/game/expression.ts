@@ -1,6 +1,13 @@
 import type { Color, ExpressionItem, Filter, Operator } from './types';
 import { valueToColor } from './color';
 
+export function nextAllowed(expr: ExpressionItem[]): Set<ExpressionItem['kind']> {
+  if (expr.length === 0) return new Set(['color']);
+  const last = expr[expr.length - 1];
+  if (last.kind === 'operator') return new Set(['color', 'value']);
+  return new Set(['operator', 'filter']);
+}
+
 function resolveColor(item: ExpressionItem): Color | null {
   if (item.kind === 'color') return item.value;
   if (item.kind === 'value') return valueToColor(item.amount, item.channel);

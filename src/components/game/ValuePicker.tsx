@@ -3,11 +3,12 @@ import type { ValueChannel } from '../../game/types';
 type Props = {
   amounts: number[];
   pending: number | null;
+  disabled?: boolean;
   onSelectAmount: (amount: number) => void;
   onSelectChannel: (channel: ValueChannel) => void;
 };
 
-export function ValuePicker({ amounts, pending, onSelectAmount, onSelectChannel }: Props) {
+export function ValuePicker({ amounts, pending, disabled, onSelectAmount, onSelectChannel }: Props) {
   if (amounts.length === 0) return null;
 
   return (
@@ -16,15 +17,17 @@ export function ValuePicker({ amounts, pending, onSelectAmount, onSelectChannel 
         <button
           key={amount}
           onClick={() => onSelectAmount(amount)}
+          disabled={disabled}
           style={{
             fontSize: 28,
             fontWeight: 'bold',
             padding: '8px 20px',
-            cursor: 'pointer',
+            cursor: disabled ? 'not-allowed' : 'pointer',
             border: pending === amount ? '2px solid #88ccff' : '2px solid #4488cc',
             borderRadius: 8,
             background: pending === amount ? '#223355' : '#1a1a1a',
             color: '#88ccff',
+            opacity: disabled ? 0.35 : 1,
           }}
         >
           {amount.toString(16).toUpperCase()}
